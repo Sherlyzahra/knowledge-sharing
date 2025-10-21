@@ -35,6 +35,13 @@ def read_root():
     }
 
 
+@app.on_event("startup")
+def on_startup():
+    """Initialize DB tables on startup for development"""
+    # import models to make sure Base.metadata has table definitions
+    init_db()
+
+
 @app.post("/questions", response_model=QuestionResponse, status_code=status.HTTP_201_CREATED)
 def create_question(
     question_data: QuestionCreate,

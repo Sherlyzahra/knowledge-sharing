@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # Development PostgreSQL for all services (separate containers for simplicity)
+  auth-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  question-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: question_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+
+  blog-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: blog_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:password@auth-db:5432/auth_db
+      SECRET_KEY: dev-secret-key
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+    ports:
+      - "8001:8001"
+    depends_on:
+      - auth-db
+
+  question-service:
+    build:
+      context: ./question-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:password@question-db:5432/question_db
+      AUTH_SERVICE_URL: http://auth-service:8001
+    ports:
+      - "8002:8002"
+    depends_on:
+      - question-db
+      - auth-service
+
+  blog-service:
+    build:
+      context: ./blog-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:password@blog-db:5432/blog_db
+      AUTH_SERVICE_URL: http://auth-service:8001
+    ports:
+      - "8003:8003"
+    depends_on:
+      - blog-db
+      - auth-service
+
+  web-forum:
+    build:
+      context: ./web-forum
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - auth-service
+      - question-service
+      - blog-service
+
+

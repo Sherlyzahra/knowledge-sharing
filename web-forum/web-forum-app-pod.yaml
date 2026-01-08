@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-forum-pod
+  labels:
+    app: web-forum
+spec:
+  containers:
+    - name: web-forum
+      image: web-forum:latest
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 5173

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-forum
+  labels:
+    app: web-forum
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web-forum
+  template:
+    metadata:
+      labels:
+        app: web-forum
+    spec:
+      containers:
+      - name: web-forum
+        image: web-forum:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5173

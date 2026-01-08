@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: blog-pod
+  labels:
+    app: blog-service
+spec:
+  containers:
+    - name: blog-service
+      image: blog-service:latest
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: blog-secret
+              key: DATABASE_URL
+        - name: AUTH_SERVICE_URL
+          valueFrom:
+            secretKeyRef:
+              name: blog-secret
+              key: AUTH_SERVICE_URL
+      ports:
+        - containerPort: 8003

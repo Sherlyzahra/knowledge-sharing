@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: question-service
+  labels:
+    app: question-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: question-service
+  template:
+    metadata:
+      labels:
+        app: question-service
+    spec:
+      containers:
+      - name: question-service
+        image: question-service:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: question-secret
+              key: DATABASE_URL
+        - name: AUTH_SERVICE_URL
+          valueFrom:
+            secretKeyRef:
+              name: question-secret
+              key: AUTH_SERVICE_URL
+        ports:
+        - containerPort: 8002

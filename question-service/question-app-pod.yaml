@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: question-pod
+  labels:
+    app: question-service
+spec:
+  containers:
+    - name: question-service
+      image: question-service:latest
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: question-secret
+              key: DATABASE_URL
+        - name: AUTH_SERVICE_URL
+          valueFrom:
+            secretKeyRef:
+              name: question-secret
+              key: AUTH_SERVICE_URL
+      ports:
+        - containerPort: 8002
